@@ -1,12 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
 import logger from './configs/logger';
 import { HttpError } from 'http-errors';
+import apiRouter from './routes/index';
 
 const app = express();
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).send('Welcome to Auth Service');
 });
+
+app.use('/api', apiRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

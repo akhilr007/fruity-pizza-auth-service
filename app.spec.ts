@@ -1,6 +1,7 @@
+import request from 'supertest';
+
 import app from './src/app';
 import { calculateDiscount } from './src/utils';
-import request from 'supertest';
 
 describe.skip('App', () => {
     it('should calculate the discount', () => {

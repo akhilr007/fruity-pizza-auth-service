@@ -1,6 +1,7 @@
-import express, { Request, Response, NextFunction } from 'express';
-import logger from './configs/logger';
+import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
+
+import logger from './configs/logger';
 import apiRouter from './routes/index';
 
 const app = express();

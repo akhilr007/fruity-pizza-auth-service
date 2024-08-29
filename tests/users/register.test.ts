@@ -41,6 +41,24 @@ describe('POST /api/v1/auth/register', () => {
                 expect.stringContaining('json'),
             );
         });
+
+        it('should persist the user in the database', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+        });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

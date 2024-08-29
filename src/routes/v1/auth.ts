@@ -1,11 +1,18 @@
 import { Router } from 'express';
 
-import { AuthController } from '../../controllers/AuthController';
+import { AppDataSource } from '../../configs/data-source';
+import { UserController } from '../../controllers/UserController';
+import { User } from '../../entity/User';
+import { UserService } from '../../services/UserService';
 
 const router = Router();
 
-const authController = new AuthController();
+const userRepository = AppDataSource.getRepository(User);
 
-router.post('/auth/register', authController.register);
+const userService = new UserService(userRepository);
+
+const userController = new UserController(userService);
+
+router.post('/auth/register', (req, res) => userController.register(req, res));
 
 export default router;

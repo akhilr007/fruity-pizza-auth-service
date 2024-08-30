@@ -126,6 +126,29 @@ describe('POST /api/v1/auth/register', () => {
             expect(users[0]).toHaveProperty('role');
             expect(users[0].role).toBe(Roles.CUSTOMER);
         });
+
+        it('should have the hashed password in the database', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(users[0].password).not.toBe(userData.password);
+            expect(users[0].password).not.toBe(userData.password);
+            expect(users[0].password).toMatch(
+                /^\$2[ayb]\$[0-9]{2}\$[./A-Za-z0-9]{53}$/,
+            );
+        });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

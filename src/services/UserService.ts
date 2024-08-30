@@ -20,11 +20,21 @@ export class UserService {
         email,
         password,
     }: UserData): Promise<User> {
+        // check for unique user
+        const user = await this.userRepository.findOne({
+            where: { email: email },
+        });
+
+        if (user) {
+            throw createHttpError(400, 'User already exists');
+        }
+
         // hash the password
         const hashedPassword = await bcrypt.hash(
             password,
             Config.SALT_ROUNDS || 10,
         );
+
         try {
             this.logger.info('User Service :: started registering the user');
             const user = await this.userRepository.save({

@@ -149,6 +149,29 @@ describe('POST /api/v1/auth/register', () => {
                 /^\$2[ayb]\$[0-9]{2}\$[./A-Za-z0-9]{53}$/,
             );
         });
+
+        it('should return 400 status code if email already exists', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userRepository = await connection.getRepository(User);
+            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+            const users = await userRepository.find();
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(1);
+        });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

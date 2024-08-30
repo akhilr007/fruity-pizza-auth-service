@@ -81,6 +81,30 @@ describe('POST /api/v1/auth/register', () => {
             expect(users[0].lastName).toBe(userData.lastName);
             expect(users[0].email).toBe(userData.email);
         });
+
+        it('should return an id of the created user', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(response.body).toHaveProperty('id');
+            expect(typeof response.body.id).toBe('number');
+            expect(users[0]).not.toBeNull();
+            expect(response.body.id).toBe(users[0].id);
+        });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

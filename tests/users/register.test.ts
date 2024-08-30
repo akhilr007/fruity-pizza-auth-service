@@ -3,8 +3,8 @@ import { DataSource } from 'typeorm';
 
 import app from '../../src/app';
 import { AppDataSource } from '../../src/configs/data-source';
+import { Roles } from '../../src/constants';
 import { User } from '../../src/entity/User';
-import { truncateTables } from '../utils/index';
 
 describe('POST /api/v1/auth/register', () => {
     let connection: DataSource;
@@ -15,7 +15,8 @@ describe('POST /api/v1/auth/register', () => {
 
     beforeEach(async () => {
         // Database truncate
-        await truncateTables(connection);
+        await connection.dropDatabase();
+        await connection.synchronize();
     });
 
     afterAll(async () => {
@@ -104,6 +105,26 @@ describe('POST /api/v1/auth/register', () => {
             expect(typeof response.body.id).toBe('number');
             expect(users[0]).not.toBeNull();
             expect(response.body.id).toBe(users[0].id);
+        });
+
+        it('should assign a customer role', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(users[0]).toHaveProperty('role');
+            expect(users[0].role).toBe(Roles.CUSTOMER);
         });
     });
 

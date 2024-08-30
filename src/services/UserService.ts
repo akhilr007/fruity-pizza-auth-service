@@ -2,6 +2,7 @@ import createHttpError from 'http-errors';
 import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
+import { Roles } from '../constants';
 import { User } from '../entity/User';
 import { UserData } from '../types';
 
@@ -24,6 +25,7 @@ export class UserService {
                 lastName,
                 email,
                 password,
+                role: Roles.CUSTOMER,
             });
             this.logger.info(
                 `User Service :: Successfully registered user with id:  ${user.id}`,

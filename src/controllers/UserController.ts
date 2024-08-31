@@ -25,6 +25,7 @@ export class UserController {
                 password: '******',
             },
         );
+
         try {
             const response = await this.userService.create({
                 firstName,

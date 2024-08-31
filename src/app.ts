@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
+import { StatusCodes } from 'http-status-codes';
 
 import logger from './configs/logger';
 import apiRouter from './routes/index';
@@ -16,22 +17,38 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api', apiRouter);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err.message);
+app.use(
+    (
+        err: HttpError & { errors?: never[] },
+        req: Request,
+        res: Response,
 
-    const statusCode = err.statusCode || 500;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _next: NextFunction,
+    ) => {
+        logger.error(err.message);
 
-    res.status(statusCode).json({
-        errors: [
-            {
-                type: err.name,
-                msg: err.message,
-                path: '',
-                location: '',
-            },
-        ],
-    });
-});
+        const statusCode =
+            err instanceof HttpError
+                ? err.statusCode
+                : StatusCodes.INTERNAL_SERVER_ERROR;
+
+        if (err.errors) {
+            logger.error(err.errors);
+            return res.status(statusCode).json({ errors: err.errors });
+        }
+
+        res.status(statusCode).json({
+            errors: [
+                {
+                    type: err.name,
+                    msg: err.message,
+                    path: '',
+                    location: '',
+                },
+            ],
+        });
+    },
+);
 
 export default app;

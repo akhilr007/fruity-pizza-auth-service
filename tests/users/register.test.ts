@@ -174,6 +174,27 @@ describe('POST /api/v1/auth/register', () => {
         });
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    describe('Fields are given', () => {});
+    describe('Fields are missing', () => {
+        it('should return 400 status code if email, firstName, lastName, password is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: '',
+                email: '',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(0);
+        });
+    });
 });

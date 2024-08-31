@@ -197,4 +197,48 @@ describe('POST /api/v1/auth/register', () => {
             expect(users).toHaveLength(0);
         });
     });
+
+    describe('sanitize fields before saving in the database', () => {
+        it('should remove trailing whitespaces from fields', async () => {
+            // Arrange
+            const userData = {
+                firstName: '   John',
+                lastName: ' Doe   ',
+                email: '  alabama@gmail.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+            const user = users[0];
+
+            expect(user.firstName).toMatch('John');
+            expect(user.lastName).toMatch('Doe');
+            expect(user.email).toMatch('alabama@gmail.com');
+        });
+
+        it('should store email in lowercase before saving in the database', async () => {
+            // Arrange
+            const userData = {
+                firstName: '   John',
+                lastName: ' Doe   ',
+                email: '  JoHn@Doe.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+            const user = users[0];
+
+            expect(user.email).toMatch('john@doe.com');
+        });
+    });
 });

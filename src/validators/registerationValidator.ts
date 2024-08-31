@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import createHttpError from 'http-errors';
+import createHttpError, { HttpError } from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { z, ZodError } from 'zod';
 
@@ -18,15 +18,15 @@ export function validateData(schema: z.ZodObject<any>) {
                     path: issue.path.join('.'),
                     location: 'body',
                 }));
-                next(
-                    createHttpError(
-                        StatusCodes.BAD_REQUEST,
-                        'Validation Error',
-                        {
-                            errors: errorMessages,
-                        },
-                    ),
+                const httpError = createHttpError(
+                    StatusCodes.BAD_REQUEST,
+                    'Validation Error',
+                    {
+                        errors: errorMessages,
+                    },
                 );
+                (httpError as HttpError).errors = errorMessages;
+                next(httpError);
             } else {
                 next(
                     createHttpError(

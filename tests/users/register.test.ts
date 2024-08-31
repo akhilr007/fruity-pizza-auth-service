@@ -240,5 +240,82 @@ describe('POST /api/v1/auth/register', () => {
 
             expect(user.email).toMatch('john@doe.com');
         });
+
+        it('should return 400 status code if password length is less than 8 chars', async () => {
+            // Arrange
+            const userData = {
+                firstName: '   John',
+                lastName: ' Doe   ',
+                email: '  email@gmail.com',
+                password: 'pass',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(0);
+        });
+
+        it('should return 400 status code if email is not valid email', async () => {
+            // Arrange
+            const userData = {
+                firstName: '   John',
+                lastName: ' Doe   ',
+                email: '  email',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(0);
+        });
+
+        it('should return an array of messages if email is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: '   John',
+                lastName: ' Doe   ',
+                email: '',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const userRepository = await connection.getRepository(User);
+            const users = await userRepository.find();
+
+            const responseBody = response.body;
+
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(0);
+            expect(responseBody).toHaveProperty('errors');
+            expect(responseBody.errors).toHaveLength(1);
+            expect(Array.isArray(responseBody.errors)).toBe(true);
+            expect(response.body.errors[0]).toEqual({
+                type: 'ValidationError',
+                msg: 'Invalid email address',
+                path: 'email',
+                location: 'body',
+            });
+        });
     });
 });

@@ -17,6 +17,7 @@ export const userRegistrationSchema = z
             .transform((email) => email.toLowerCase()),
         password: z
             .string()
-            .min(6, { message: 'Password must be at least 6 characters long' }),
+            .trim()
+            .min(8, { message: 'Password must be at least 8 characters long' }),
     })
     .strict();

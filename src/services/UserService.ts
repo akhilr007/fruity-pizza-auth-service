@@ -30,10 +30,8 @@ export class UserService {
         }
 
         // hash the password
-        const hashedPassword = await bcrypt.hash(
-            password,
-            Config.SALT_ROUNDS || 10,
-        );
+        const saltRounds = Number(Config.SALT_ROUNDS) || 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         try {
             this.logger.info('User Service :: started registering the user');

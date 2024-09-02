@@ -8,12 +8,14 @@ import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
 import { Config } from '../configs';
-import { AppDataSource } from '../configs/data-source';
 import { RefreshToken } from '../entity/RefreshToken';
 import { User } from '../entity/User';
 
 export class AuthService {
-    constructor(private logger: Logger) {}
+    constructor(
+        private refreshTokenRepository: Repository<RefreshToken>,
+        private logger: Logger,
+    ) {}
 
     private getPrivateKey(): Buffer {
         try {
@@ -46,12 +48,7 @@ export class AuthService {
         });
 
         // Persist refresh token in database
-        const refreshTokenRepository: Repository<RefreshToken> =
-            AppDataSource.getRepository('RefreshToken');
-        const newRefreshToken = await this.saveInDb(
-            refreshTokenRepository,
-            user,
-        );
+        const newRefreshToken = await this.saveInDb(user);
 
         const refreshTokenSecret: string =
             Config.REFRESH_TOKEN_SECRET || 'my-secret';
@@ -86,12 +83,9 @@ export class AuthService {
         });
     }
 
-    async saveInDb(
-        refreshTokenRepository: Repository<RefreshToken>,
-        user: User,
-    ): Promise<RefreshToken> {
+    async saveInDb(user: User): Promise<RefreshToken> {
         const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
-        const newRefreshToken = refreshTokenRepository.save({
+        const newRefreshToken = this.refreshTokenRepository.save({
             user: user,
             expiresAt: new Date(Date.now() + MS_IN_YEAR),
         });

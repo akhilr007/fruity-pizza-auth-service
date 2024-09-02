@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 
@@ -5,6 +6,7 @@ import app from '../../src/app';
 import { AppDataSource } from '../../src/configs/data-source';
 import { Roles } from '../../src/constants';
 import { User } from '../../src/entity/User';
+import { isJwt } from '../utils';
 
 describe('POST /api/v1/auth/register', () => {
     let connection: DataSource;
@@ -39,7 +41,7 @@ describe('POST /api/v1/auth/register', () => {
                 .send(userData);
 
             // Assert
-            expect(response.statusCode).toBe(201);
+            expect(response.statusCode).toBe(StatusCodes.CREATED);
         });
 
         it('should return valid json response', async () => {
@@ -144,7 +146,6 @@ describe('POST /api/v1/auth/register', () => {
             const users = await userRepository.find();
 
             expect(users[0].password).not.toBe(userData.password);
-            expect(users[0].password).not.toBe(userData.password);
             expect(users[0].password).toMatch(
                 /^\$2[ayb]\$[0-9]{2}\$[./A-Za-z0-9]{53}$/,
             );
@@ -171,6 +172,46 @@ describe('POST /api/v1/auth/register', () => {
             // Assert
             expect(response.statusCode).toBe(400);
             expect(users).toHaveLength(1);
+        });
+
+        it('should return access token and refresh token inside a cookie', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            interface Headers {
+                ['set-cookie']: string[];
+            }
+
+            const cookies =
+                (response.headers as unknown as Headers)['set-cookie'] || [];
+
+            let accessToken: string | null = null;
+            let refreshToken: string | null = null;
+
+            cookies.forEach((cookie) => {
+                if (cookie.startsWith('accessToken=')) {
+                    accessToken = cookie.split(';')[0].split('=')[1];
+                } else if (cookie.startsWith('refreshToken=')) {
+                    refreshToken = cookie.split(';')[0].split('=')[1];
+                }
+            });
+
+            expect(accessToken).not.toBeNull();
+            expect(refreshToken).not.toBeNull();
+
+            expect(isJwt(accessToken)).toBeTruthy();
+            expect(isJwt(refreshToken)).toBeTruthy();
         });
     });
 

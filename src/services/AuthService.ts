@@ -4,9 +4,12 @@ import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import path from 'path';
+import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
 import { Config } from '../configs';
+import { AppDataSource } from '../configs/data-source';
+import { RefreshToken } from '../entity/RefreshToken';
 import { User } from '../entity/User';
 
 export class AuthService {
@@ -26,7 +29,9 @@ export class AuthService {
         }
     }
 
-    generateTokens(user: User): { accessToken: string; refreshToken: string } {
+    async generateTokens(
+        user: User,
+    ): Promise<{ accessToken: string; refreshToken: string }> {
         const privateKey = this.getPrivateKey();
 
         const payload: JwtPayload = {
@@ -40,6 +45,14 @@ export class AuthService {
             issuer: 'auth-service',
         });
 
+        // Persist refresh token in database
+        const refreshTokenRepository: Repository<RefreshToken> =
+            AppDataSource.getRepository('RefreshToken');
+        const newRefreshToken = await this.saveInDb(
+            refreshTokenRepository,
+            user,
+        );
+
         const refreshTokenSecret: string =
             Config.REFRESH_TOKEN_SECRET || 'my-secret';
 
@@ -47,6 +60,7 @@ export class AuthService {
             algorithm: 'HS256',
             expiresIn: '1y',
             issuer: 'auth-service',
+            jwtid: String(newRefreshToken.id),
         });
 
         return { accessToken, refreshToken };
@@ -70,5 +84,17 @@ export class AuthService {
             maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
             httpOnly: true,
         });
+    }
+
+    async saveInDb(
+        refreshTokenRepository: Repository<RefreshToken>,
+        user: User,
+    ): Promise<RefreshToken> {
+        const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
+        const newRefreshToken = refreshTokenRepository.save({
+            user: user,
+            expiresAt: new Date(Date.now() + MS_IN_YEAR),
+        });
+        return newRefreshToken;
     }
 }

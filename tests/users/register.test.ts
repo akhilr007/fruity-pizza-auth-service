@@ -213,6 +213,34 @@ describe('POST /api/v1/auth/register', () => {
             expect(isJwt(accessToken)).toBeTruthy();
             expect(isJwt(refreshToken)).toBeTruthy();
         });
+
+        it('should store the refresh tokens in the database', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            // Assert
+            const refreshTokenRepository =
+                await connection.getRepository('RefreshToken');
+
+            const tokens = await refreshTokenRepository
+                .createQueryBuilder('refreshToken')
+                .where('refreshToken.userId = :userId', {
+                    userId: response.body.id,
+                })
+                .getMany();
+
+            expect(tokens).toHaveLength(1);
+        });
     });
 
     describe('Fields are missing', () => {

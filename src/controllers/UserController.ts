@@ -40,7 +40,7 @@ export class UserController {
             this.logger.info('User has been registered', { id: response.id });
 
             const { accessToken, refreshToken } =
-                this.authService.generateTokens(response);
+                await this.authService.generateTokens(response);
 
             this.authService.setAuthCookies(res, accessToken, refreshToken);
 

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
+import { StatusCodes } from 'http-status-codes';
 import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
@@ -26,7 +27,10 @@ export class UserService {
         });
 
         if (user) {
-            throw createHttpError(400, 'User already exists');
+            throw createHttpError(
+                StatusCodes.CONFLICT,
+                'User already exists with same email.',
+            );
         }
 
         // hash the password

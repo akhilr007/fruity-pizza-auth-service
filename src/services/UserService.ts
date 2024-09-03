@@ -22,9 +22,7 @@ export class UserService {
         password,
     }: UserData): Promise<User> {
         // check for unique user
-        const user = await this.userRepository.findOne({
-            where: { email: email },
-        });
+        const user = await this.findByEmail(email);
 
         if (user) {
             throw createHttpError(
@@ -56,5 +54,13 @@ export class UserService {
             });
             throw createHttpError(500, 'Failed to register user in database');
         }
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return await this.userRepository.findOne({
+            where: {
+                email: email,
+            },
+        });
     }
 }

@@ -21,3 +21,14 @@ export const userRegistrationSchema = z
             .min(8, { message: 'Password must be at least 8 characters long' }),
     })
     .strict();
+
+export const userLoginSchema = z
+    .object({
+        email: z
+            .string()
+            .trim()
+            .email({ message: 'Invalid email address' })
+            .transform((email) => email.toLowerCase()),
+        password: z.string().trim(),
+    })
+    .strict();

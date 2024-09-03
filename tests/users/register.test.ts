@@ -151,7 +151,7 @@ describe('POST /api/v1/auth/register', () => {
             );
         });
 
-        it('should return 400 status code if email already exists', async () => {
+        it('should return 409 status code if email already exists', async () => {
             // Arrange
             const userData = {
                 firstName: 'John',
@@ -170,7 +170,7 @@ describe('POST /api/v1/auth/register', () => {
             const users = await userRepository.find();
 
             // Assert
-            expect(response.statusCode).toBe(400);
+            expect(response.statusCode).toBe(409);
             expect(users).toHaveLength(1);
         });
 

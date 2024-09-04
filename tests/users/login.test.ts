@@ -200,5 +200,21 @@ describe('POST /api/v1/auth/login', () => {
     });
 
     // todo
-    // describe('Fields are empty', () => {});
+    describe('Fields are empty', () => {
+        it('should return 400 status code if email, password is missing', async () => {
+            // Arrange
+            const userLoginData = {
+                email: '',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+        });
+    });
 });

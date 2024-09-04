@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
@@ -112,5 +112,14 @@ export class UserController {
             this.logger.error(error);
             next(error);
         }
+    }
+
+    async whoami(
+        req: Request,
+        res: Response,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        next: NextFunction,
+    ): Promise<void> {
+        res.status(StatusCodes.OK).json();
     }
 }

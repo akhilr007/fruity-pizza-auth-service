@@ -38,4 +38,8 @@ router.post('/auth/login', validateData(userLoginSchema), (req, res, next) =>
     userController.login(req, res, next),
 );
 
+router.get('/auth/whoami', (req, res, next) =>
+    userController.whoami(req, res, next),
+);
+
 export default router;

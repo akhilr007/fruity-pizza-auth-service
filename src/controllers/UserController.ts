@@ -73,7 +73,7 @@ export class UserController {
             if (!user) {
                 next(
                     createHttpError(
-                        StatusCodes.NOT_FOUND,
+                        StatusCodes.UNAUTHORIZED,
                         'Email or Password does not match',
                     ),
                 );
@@ -88,7 +88,7 @@ export class UserController {
             if (!passwordMatch) {
                 next(
                     createHttpError(
-                        StatusCodes.BAD_REQUEST,
+                        StatusCodes.UNAUTHORIZED,
                         'Email or Password does not match',
                     ),
                 );

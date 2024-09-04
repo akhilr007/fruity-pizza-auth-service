@@ -102,6 +102,54 @@ describe('POST /api/v1/auth/login', () => {
             expect(response).not.toBeNull();
             expect(response.body.id).toBe(user.body.id);
         });
+
+        it('should return 401 status code if email is wrong', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userLoginData = {
+                email: 'john.doe@example.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+        });
+
+        it('should return 401 status code if password is wrong', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userLoginData = {
+                email: 'john@example.com',
+                password: 'passwordsdf',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+        });
     });
 
     // todo

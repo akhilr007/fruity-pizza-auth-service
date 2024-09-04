@@ -47,6 +47,32 @@ describe('POST /api/v1/auth/login', () => {
             // Assert
             expect(response.statusCode).toBe(StatusCodes.OK);
         });
+
+        it('should return valid json response', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userLoginData = {
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            expect(response.headers['content-type']).toEqual(
+                expect.stringContaining('json'),
+            );
+        });
     });
 
     // todo

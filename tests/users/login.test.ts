@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 
 import app from '../../src/app';
 import { AppDataSource } from '../../src/configs/data-source';
+import { isJwt } from '../utils';
 
 describe('POST /api/v1/auth/login', () => {
     let connection: DataSource;
@@ -149,6 +150,52 @@ describe('POST /api/v1/auth/login', () => {
 
             // Assert
             expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+        });
+
+        it('should return access token and refresh token inside a cookie', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userLoginData = {
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            await request(app).post('/api/v1/auth/register').send(userData);
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            interface Headers {
+                ['set-cookie']: string[];
+            }
+
+            const cookies =
+                (response.headers as unknown as Headers)['set-cookie'] || [];
+
+            let accessToken: string | null = null;
+            let refreshToken: string | null = null;
+
+            cookies.forEach((cookie) => {
+                if (cookie.startsWith('accessToken=')) {
+                    accessToken = cookie.split(';')[0].split('=')[1];
+                } else if (cookie.startsWith('refreshToken=')) {
+                    refreshToken = cookie.split(';')[0].split('=')[1];
+                }
+            });
+
+            expect(accessToken).not.toBeNull();
+            expect(refreshToken).not.toBeNull();
+
+            expect(isJwt(accessToken)).toBeTruthy();
+            expect(isJwt(refreshToken)).toBeTruthy();
         });
     });
 

@@ -73,6 +73,35 @@ describe('POST /api/v1/auth/login', () => {
                 expect.stringContaining('json'),
             );
         });
+
+        it('should return id of the logged in user', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            const userLoginData = {
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            // Act
+            const user = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+            const response = await request(app)
+                .post('/api/v1/auth/login')
+                .send(userLoginData);
+
+            // Assert
+            expect(response.body).toHaveProperty('id');
+            expect(typeof response.body.id).toBe('number');
+            expect(response).not.toBeNull();
+            expect(response.body.id).toBe(user.body.id);
+        });
     });
 
     // todo

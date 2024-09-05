@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import { AuthService } from '../services/AuthService';
 import { CredentialService } from '../services/CredentialService';
 import { UserService } from '../services/UserService';
-import { RegisterUserRequest } from '../types';
+import { AuthRequest, RegisterUserRequest } from '../types';
 
 export class UserController {
     constructor(
@@ -115,11 +115,20 @@ export class UserController {
     }
 
     async whoami(
-        req: Request,
+        req: AuthRequest,
         res: Response,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         next: NextFunction,
     ): Promise<void> {
-        res.status(StatusCodes.OK).json();
+        try {
+            const user = await this.userService.findById(Number(req.auth.sub));
+            if (!user) {
+                next(createHttpError(StatusCodes.NOT_FOUND, 'User not found'));
+                return;
+            }
+            res.status(StatusCodes.OK).json(user);
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
     }
 }

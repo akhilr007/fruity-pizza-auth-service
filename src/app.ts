@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import cookieParser from 'cookie-parser';
 import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
@@ -9,6 +10,7 @@ import apiRouter from './routes/index';
 
 const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {

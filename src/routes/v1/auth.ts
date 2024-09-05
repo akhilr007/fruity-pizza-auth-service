@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import logger from '../../configs/logger';
 import { UserController } from '../../controllers/UserController';
+import authenticate from '../../middlewares/authenticate';
 import { refreshTokenRepository } from '../../repositories/refreshToken.repository';
 import { userRepository } from '../../repositories/user.repository';
 import {
@@ -11,6 +12,7 @@ import {
 import { AuthService } from '../../services/AuthService';
 import { CredentialService } from '../../services/CredentialService';
 import { UserService } from '../../services/UserService';
+import { AuthRequest } from '../../types';
 import { validateData } from '../../validators/validateData';
 
 const router = Router();
@@ -38,8 +40,8 @@ router.post('/auth/login', validateData(userLoginSchema), (req, res, next) =>
     userController.login(req, res, next),
 );
 
-router.get('/auth/whoami', (req, res, next) =>
-    userController.whoami(req, res, next),
+router.get('/auth/whoami', authenticate, (req, res, next) =>
+    userController.whoami(req as AuthRequest, res, next),
 );
 
 export default router;

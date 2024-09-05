@@ -6,11 +6,7 @@ export default {
     },
     verbose: true,
     collectCoverage: true, // Enables test coverage collection
-    collectCoverageFrom: [
-        'src/**/*.ts',
-        '!**/node_modules/**',
-        '!tests/**/*.{test,spec}.ts',
-    ],
+    collectCoverageFrom: [],
     coverageDirectory: 'coverage', // Output directory for coverage reports
     coverageReporters: ['html'], // Report formats
 };

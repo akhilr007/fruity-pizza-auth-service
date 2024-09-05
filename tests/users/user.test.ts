@@ -87,5 +87,34 @@ describe('GET /api/v1/auth/whoami', () => {
             // check if user id matches with registered user
             expect(response.body.id).toBe(user.id);
         });
+
+        it('should not return user password', async () => {
+            // register user
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@email.com',
+                password: 'password',
+            };
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.save({
+                ...userData,
+                role: Roles.CUSTOMER,
+            });
+
+            // generate token
+            const accessToken = jwksMock.token({
+                sub: String(user.id),
+                role: user.role,
+            });
+            // add token to cookies
+            const response = await request(app)
+                .get('/api/v1/auth/whoami')
+                .set('Cookie', [`accessToken=${accessToken};`])
+                .send();
+
+            // Assert
+            expect(response.body).not.toHaveProperty('password');
+        });
     });
 });

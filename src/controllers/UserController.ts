@@ -125,7 +125,7 @@ export class UserController {
                 next(createHttpError(StatusCodes.NOT_FOUND, 'User not found'));
                 return;
             }
-            res.status(StatusCodes.OK).json(user);
+            res.status(StatusCodes.OK).json({ ...user, password: undefined });
         } catch (error) {
             this.logger.error(error);
             next(error);

@@ -5,8 +5,4 @@ export default {
         '^.+.tsx?$': ['ts-jest', {}],
     },
     verbose: true,
-    collectCoverage: true, // Enables test coverage collection
-    collectCoverageFrom: [],
-    coverageDirectory: 'coverage', // Output directory for coverage reports
-    coverageReporters: ['html'], // Report formats
 };

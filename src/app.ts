@@ -10,6 +10,7 @@ import apiRouter from './routes/index';
 
 const app = express();
 
+app.use(express.static('public'));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -31,9 +32,7 @@ app.use(
         logger.error(err.message);
 
         const statusCode =
-            err instanceof HttpError
-                ? err.statusCode
-                : StatusCodes.INTERNAL_SERVER_ERROR;
+            err.statusCode || err.status || StatusCodes.INTERNAL_SERVER_ERROR;
 
         if (err.errors) {
             logger.error(err.errors);

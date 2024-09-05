@@ -116,5 +116,28 @@ describe('GET /api/v1/auth/whoami', () => {
             // Assert
             expect(response.body).not.toHaveProperty('password');
         });
+
+        it('should return 401 status code if token does not exist', async () => {
+            // register user
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@email.com',
+                password: 'password',
+            };
+            const userRepository = connection.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                role: Roles.CUSTOMER,
+            });
+
+            // add token to cookies
+            const response = await request(app)
+                .get('/api/v1/auth/whoami')
+                .send();
+
+            // Assert
+            expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+        });
     });
 });

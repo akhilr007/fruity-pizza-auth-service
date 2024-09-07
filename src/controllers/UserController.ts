@@ -186,4 +186,32 @@ export class UserController {
             next(error);
         }
     }
+
+    async logout(
+        req: AuthRequest,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
+        this.logger.info('User Controller :: Logout request :: ');
+        try {
+            this.authService.deleteRefreshToken(Number(req.auth.id));
+
+            this.logger.info(
+                `Refresh token is deleted with ID: ${req.auth.id}`,
+            );
+
+            this.logger.info(`User is now logged out with ID: ${req.auth.sub}`);
+
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+
+            res.status(StatusCodes.OK).json({
+                success: true,
+                message: 'Logout successful',
+            });
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
 }

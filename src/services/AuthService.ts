@@ -36,38 +36,31 @@ export class AuthService {
         return jwt.sign(payload, privateKey, {
             algorithm: 'RS256',
             expiresIn: '1h',
-            issuer: 'auth-service',
         });
     }
 
-    private async generateRefreshToken(
-        payload: JwtPayload,
-        user: User,
-    ): Promise<string> {
+    private async generateRefreshToken(payload: JwtPayload): Promise<string> {
         const refreshTokenSecret = Config.REFRESH_TOKEN_SECRET || 'my-secret';
-
-        // Persist refresh token in database
-        const newRefreshToken = await this.saveInDb(user);
 
         return jwt.sign(payload, refreshTokenSecret, {
             algorithm: 'HS256',
             expiresIn: '1y',
-            issuer: 'auth-service',
-            jwtid: String(newRefreshToken.id),
+            jwtid: String(payload.id),
         });
     }
 
     async generateTokens(
+        payload: JwtPayload,
         user: User,
     ): Promise<{ accessToken: string; refreshToken: string }> {
-        const payload: JwtPayload = {
-            sub: String(user.id),
-            role: user.role,
-            issuer: 'auth-service',
-        };
-
         const accessToken = this.generateAccessToken(payload);
-        const refreshToken = await this.generateRefreshToken(payload, user);
+
+        // Persist refresh token in database
+        const newRefreshToken = await this.saveInDb(user);
+        const refreshToken = await this.generateRefreshToken({
+            ...payload,
+            id: String(newRefreshToken.id),
+        });
 
         return { accessToken, refreshToken };
     }
@@ -98,5 +91,9 @@ export class AuthService {
             user: user,
             expiresAt: new Date(Date.now() + MS_IN_YEAR),
         });
+    }
+
+    async deleteRefreshToken(tokenId: number): Promise<void> {
+        this.refreshTokenRepository.delete({ id: tokenId });
     }
 }

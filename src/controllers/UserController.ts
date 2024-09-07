@@ -33,22 +33,27 @@ export class UserController {
         );
 
         try {
-            const response = await this.userService.create({
+            const user = await this.userService.create({
                 firstName,
                 lastName,
                 email,
                 password,
             });
 
-            this.logger.info('User has been registered', { id: response.id });
+            this.logger.info('User has been registered', { id: user.id });
 
+            const payload = {
+                sub: String(user.id),
+                role: user.role,
+                issuer: 'auth-service',
+            };
             const { accessToken, refreshToken } =
-                await this.authService.generateTokens(response);
+                await this.authService.generateTokens(payload, user);
 
             this.authService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(StatusCodes.CREATED).json({
-                id: response.id,
+                id: user.id,
             });
         } catch (error) {
             next(error);
@@ -95,9 +100,15 @@ export class UserController {
                 return;
             }
 
+            const payload = {
+                sub: String(user.id),
+                role: user.role,
+                issuer: 'auth-service',
+            };
+
             // todo: generate tokens
             const { accessToken, refreshToken } =
-                await this.authService.generateTokens(user);
+                await this.authService.generateTokens(payload, user);
 
             // todo: add tokens to cookies
             this.authService.setAuthCookies(res, accessToken, refreshToken);
@@ -119,13 +130,57 @@ export class UserController {
         res: Response,
         next: NextFunction,
     ): Promise<void> {
+        this.logger.info('User Controller :: Request for refresh token ', {
+            sub: req.auth.sub,
+            role: req.auth.role,
+        });
+
         try {
+            const user = await this.userService.findById(Number(req.auth.sub));
+            if (!user) {
+                this.logger.error(
+                    `Couldn't refresh the token for ${req.auth.sub}`,
+                );
+                next(createHttpError(StatusCodes.NOT_FOUND, 'User not found'));
+                return;
+            }
+
+            this.logger.info(
+                'User Controller :: Successfull in refreshing the token',
+            );
+            res.status(StatusCodes.OK).json({ ...user, password: undefined });
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
+
+    async refresh(
+        req: AuthRequest,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
+        try {
+            const payload = {
+                sub: req.auth.sub,
+                role: req.auth.role,
+            };
+
             const user = await this.userService.findById(Number(req.auth.sub));
             if (!user) {
                 next(createHttpError(StatusCodes.NOT_FOUND, 'User not found'));
                 return;
             }
-            res.status(StatusCodes.OK).json({ ...user, password: undefined });
+
+            const { accessToken, refreshToken } =
+                await this.authService.generateTokens(payload, user);
+
+            // delete old refresh token
+            await this.authService.deleteRefreshToken(Number(req.auth.id));
+
+            this.authService.setAuthCookies(res, accessToken, refreshToken);
+
+            res.status(StatusCodes.OK).json({ success: true });
         } catch (error) {
             this.logger.error(error);
             next(error);

@@ -94,5 +94,28 @@ describe('POST /api/v1/tenants', () => {
             expect(tenants).toHaveLength(0);
             expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
         });
+
+        it('should return 403 if user is not admin', async () => {
+            const tenantData = {
+                name: 'Alex Foods',
+                address: 'New York',
+            };
+
+            const accessToken = jwksMock.token({
+                sub: '1',
+                role: Roles.MANAGER,
+            });
+
+            const response = await request(app)
+                .post('/api/v1/tenants')
+                .set('Cookie', [`accessToken=${accessToken}`])
+                .send(tenantData);
+
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenants = await tenantRepository.find();
+
+            expect(tenants).toHaveLength(0);
+            expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
+        });
     });
 });

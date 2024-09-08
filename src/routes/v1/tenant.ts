@@ -1,9 +1,15 @@
 import { Router } from 'express';
 
+import logger from '../../configs/logger';
+import { TenantController } from '../../controllers/TenantController';
+import { tenantRepository } from '../../repositories/tenant.repository';
+import { TenantService } from '../../services/TenantService';
+
 const router = Router();
 
-router.post('/', (req, res) => {
-    res.status(201).json();
-});
+const tenantService = new TenantService(tenantRepository, logger);
+const tenantController = new TenantController(tenantService, logger);
+
+router.post('/', (req, res, next) => tenantController.create(req, res, next));
 
 export default router;

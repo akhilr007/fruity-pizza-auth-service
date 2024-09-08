@@ -18,3 +18,8 @@ export interface AuthRequest extends Request {
         id?: string;
     };
 }
+
+export interface TenantRequestData {
+    name: string;
+    address: string;
+}

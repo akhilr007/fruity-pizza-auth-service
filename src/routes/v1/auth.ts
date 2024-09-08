@@ -33,24 +33,24 @@ const userController = new UserController(
 );
 
 router.post(
-    '/auth/register',
+    '/register',
     validateData(userRegistrationSchema),
     (req, res, next) => userController.register(req, res, next),
 );
 
-router.post('/auth/login', validateData(userLoginSchema), (req, res, next) =>
+router.post('/login', validateData(userLoginSchema), (req, res, next) =>
     userController.login(req, res, next),
 );
 
-router.get('/auth/whoami', authenticate, (req, res, next) =>
+router.get('/whoami', authenticate, (req, res, next) =>
     userController.whoami(req as AuthRequest, res, next),
 );
 
-router.post('/auth/refresh', validateRefreshToken, (req, res, next) =>
+router.post('/refresh', validateRefreshToken, (req, res, next) =>
     userController.refresh(req as AuthRequest, res, next),
 );
 
-router.post('/auth/logout', authenticate, parseRefreshToken, (req, res, next) =>
+router.post('/logout', authenticate, parseRefreshToken, (req, res, next) =>
     userController.logout(req as AuthRequest, res, next),
 );
 

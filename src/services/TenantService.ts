@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
-import logger from '../configs/logger';
 import { Tenant } from '../entity/Tenant';
 import { TenantRequestData } from '../types';
 
@@ -14,7 +13,7 @@ export class TenantService {
     ) {}
 
     async create({ name, address }: TenantRequestData): Promise<Tenant> {
-        logger.info('TenantService :: Request to create a tenant');
+        this.logger.info('TenantService :: Request to create a tenant');
 
         try {
             this.logger.info('TenantService :: Successfully created a tenant');
@@ -24,6 +23,18 @@ export class TenantService {
             throw createHttpError(
                 StatusCodes.INTERNAL_SERVER_ERROR,
                 'Failed to create tenant.',
+            );
+        }
+    }
+
+    async update(id: number, tenantData: TenantRequestData) {
+        try {
+            return await this.tenantRepository.update(id, tenantData);
+        } catch (error) {
+            this.logger.error(error);
+            throw createHttpError(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                'Failed to update tenant.',
             );
         }
     }

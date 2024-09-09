@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
@@ -27,6 +28,38 @@ export class TenantController {
             res.status(StatusCodes.CREATED).json({
                 id: tenant.id,
             });
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
+
+    async update(req: Request, res: Response, next: NextFunction) {
+        const tenantId = req.params.id;
+
+        if (isNaN(Number(tenantId))) {
+            next(createHttpError(400, 'Invalid url param.'));
+            return;
+        }
+
+        const { name, address } = req.body;
+
+        this.logger.debug(
+            'TenantController :: Request for updating a tenant',
+            req.body,
+        );
+
+        try {
+            await this.tenantService.update(Number(tenantId), {
+                name,
+                address,
+            });
+
+            this.logger.info('TenantController :: Tenant has been updated', {
+                id: tenantId,
+            });
+
+            res.status(StatusCodes.OK).json({ id: Number(tenantId) });
         } catch (error) {
             this.logger.error(error);
             next(error);

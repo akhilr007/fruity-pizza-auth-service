@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
 import { Config } from '../configs';
-import { Roles } from '../constants';
 import { User } from '../entity/User';
 import { UserData } from '../types';
 
@@ -20,6 +19,7 @@ export class UserService {
         lastName,
         email,
         password,
+        role,
     }: UserData): Promise<User> {
         // check for unique user
         const user = await this.findByEmail(email);
@@ -42,7 +42,7 @@ export class UserService {
                 lastName,
                 email,
                 password: hashedPassword,
-                role: Roles.CUSTOMER,
+                role,
             });
             this.logger.info(
                 `User Service :: Successfully registered user with id:  ${user.id}`,

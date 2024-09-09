@@ -3,6 +3,7 @@ import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
+import { Roles } from '../constants';
 import { AuthService } from '../services/AuthService';
 import { CredentialService } from '../services/CredentialService';
 import { UserService } from '../services/UserService';
@@ -38,6 +39,7 @@ export class UserController {
                 lastName,
                 email,
                 password,
+                role: Roles.CUSTOMER,
             });
 
             this.logger.info('User has been registered', { id: user.id });

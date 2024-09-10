@@ -31,4 +31,8 @@ router.patch(
     (req, res, next) => tenantController.update(req, res, next),
 );
 
+router.get('/:id', authenticate, (req, res, next) =>
+    tenantController.findById(req, res, next),
+);
+
 export default router;

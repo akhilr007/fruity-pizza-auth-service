@@ -38,4 +38,20 @@ export class TenantService {
             );
         }
     }
+
+    async findById(id: number): Promise<Tenant | null> {
+        try {
+            return await this.tenantRepository.findOne({
+                where: {
+                    id,
+                },
+            });
+        } catch (error) {
+            this.logger.error(error);
+            throw createHttpError(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                `Failed to get the tenant with id: ${id}`,
+            );
+        }
+    }
 }

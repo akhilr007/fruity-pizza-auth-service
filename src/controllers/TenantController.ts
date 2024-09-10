@@ -65,4 +65,38 @@ export class TenantController {
             next(error);
         }
     }
+
+    async findById(
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
+        const tenantId = req.params.id;
+        this.logger.info(
+            'TenantController :: Request for getting a tenant with id ' +
+                tenantId,
+        );
+        if (isNaN(Number(tenantId))) {
+            this.logger.error(
+                'TenantController :: Invalid tenant id:' + tenantId,
+            );
+            next(createHttpError(400, 'Invalid url param.'));
+            return;
+        }
+
+        try {
+            const response = await this.tenantService.findById(
+                Number(tenantId),
+            );
+
+            this.logger.info(
+                'TenantController :: Successfully find the tenant with id ' +
+                    tenantId,
+            );
+            res.status(StatusCodes.OK).json(response);
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
 }

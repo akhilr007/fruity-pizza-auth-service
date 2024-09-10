@@ -8,6 +8,7 @@ import { canAccess } from '../../middlewares/canAccess';
 import { tenantRepository } from '../../repositories/tenant.repository';
 import { tenantSchema } from '../../schemas/tenant-schema';
 import { TenantService } from '../../services/TenantService';
+import { listTenantValidator } from '../../validators/listTenantsValidators';
 import { validateData } from '../../validators/validateData';
 
 const router = Router();
@@ -35,7 +36,7 @@ router.get('/:id', authenticate, canAccess([Roles.ADMIN]), (req, res, next) =>
     tenantController.findById(req, res, next),
 );
 
-router.get('/', authenticate, canAccess([Roles.ADMIN]), (req, res, next) =>
+router.get('/', listTenantValidator, (req, res, next) =>
     tenantController.findAll(req, res, next),
 );
 

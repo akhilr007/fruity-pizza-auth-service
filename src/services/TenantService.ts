@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
 import { Tenant } from '../entity/Tenant';
-import { TenantRequestData } from '../types';
+import { TenantQueryParams, TenantRequestData } from '../types';
 
 export class TenantService {
     constructor(
@@ -55,9 +55,28 @@ export class TenantService {
         }
     }
 
-    async findAll(): Promise<Tenant[]> {
+    async findAll(
+        validatedQuery: TenantQueryParams,
+    ): Promise<[Tenant[], number]> {
         try {
-            return await this.tenantRepository.find();
+            const queryBuilder =
+                this.tenantRepository.createQueryBuilder('tenant');
+
+            if (validatedQuery.q) {
+                const searchTerm = `%${validatedQuery.q}%`;
+                queryBuilder.where(
+                    `CONCAT(tenant.name, ' ', tenant.address ILike :q)`,
+                    { q: searchTerm },
+                );
+            }
+
+            const result = await queryBuilder
+                .skip((validatedQuery.currentPage - 1) * validatedQuery.perPage)
+                .take(validatedQuery.perPage)
+                .orderBy('tenant.id', 'DESC')
+                .getManyAndCount();
+
+            return result;
         } catch (error) {
             this.logger.error(error);
             throw createHttpError(

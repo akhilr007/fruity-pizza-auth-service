@@ -3,12 +3,16 @@ import createHttpError, { HttpError } from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { z, ZodError } from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function validateData(schema: z.ZodObject<any>) {
+export function validateData(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    schema: z.ZodObject<any>,
+    target: 'body' | 'query' | 'params' = 'body',
+) {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
-            const validatedData = schema.parse(req.body);
-            req.body = validatedData;
+            const dataToValidate = req[target];
+            const validatedData = schema.parse(dataToValidate);
+            req[target] = validatedData;
             next();
         } catch (error) {
             if (error instanceof ZodError) {

@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
 import { TenantService } from '../services/TenantService';
+import { TenantQueryParams } from '../types';
 
 export class TenantController {
     constructor(
@@ -107,13 +108,21 @@ export class TenantController {
     ): Promise<void> {
         this.logger.info('TenantController :: Request to get all tenants list');
         try {
-            const response = await this.tenantService.findAll();
+            const validatedQuery = req.query as unknown as TenantQueryParams;
+
+            const [tenants, count] =
+                await this.tenantService.findAll(validatedQuery);
 
             this.logger.info(
                 'TenantController :: Successfully fetched all tenants',
             );
 
-            res.status(StatusCodes.OK).json(response);
+            res.status(StatusCodes.OK).json({
+                currentPage: validatedQuery.currentPage,
+                perPage: validatedQuery.perPage,
+                total: count,
+                data: tenants,
+            });
         } catch (error) {
             this.logger.error(error);
             next(error);

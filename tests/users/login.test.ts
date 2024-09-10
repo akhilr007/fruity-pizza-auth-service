@@ -31,6 +31,7 @@ describe('POST /api/v1/auth/login', () => {
                 lastName: 'Doe',
                 email: 'john.doe@email.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userLoginData = {
@@ -82,6 +83,7 @@ describe('POST /api/v1/auth/login', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userLoginData = {
@@ -111,6 +113,7 @@ describe('POST /api/v1/auth/login', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userLoginData = {
@@ -135,11 +138,12 @@ describe('POST /api/v1/auth/login', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userLoginData = {
                 email: 'john@example.com',
-                password: 'passwordsdf',
+                password: 'passwordsfd',
             };
 
             // Act
@@ -159,6 +163,7 @@ describe('POST /api/v1/auth/login', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userLoginData = {

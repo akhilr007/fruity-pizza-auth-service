@@ -3,6 +3,7 @@ import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
+import { Roles } from '../constants';
 import { AuthService } from '../services/AuthService';
 import { CredentialService } from '../services/CredentialService';
 import { UserService } from '../services/UserService';
@@ -21,7 +22,13 @@ export class UserController {
         res: Response,
         next: NextFunction,
     ): Promise<void> {
-        const { firstName, lastName, email, password, role } = req.body;
+        const {
+            firstName,
+            lastName,
+            email,
+            password,
+            role = Roles.CUSTOMER,
+        } = req.body;
         this.logger.debug(
             'User Controller :: New request to register a user: ',
             {

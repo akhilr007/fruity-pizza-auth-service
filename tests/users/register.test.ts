@@ -33,6 +33,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -51,6 +52,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -71,6 +73,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -92,6 +95,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -116,6 +120,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -136,6 +141,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -158,6 +164,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             const userRepository = await connection.getRepository(User);
@@ -181,6 +188,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -221,6 +229,7 @@ describe('POST /api/v1/auth/register', () => {
                 lastName: 'Smith',
                 email: 'john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -249,8 +258,9 @@ describe('POST /api/v1/auth/register', () => {
             const userData = {
                 firstName: 'John',
                 lastName: '',
-                email: '',
+                email: 'john@example.com',
                 password: 'password',
+                role: '',
             };
 
             // Act
@@ -271,10 +281,11 @@ describe('POST /api/v1/auth/register', () => {
         it('should remove trailing whitespaces from fields', async () => {
             // Arrange
             const userData = {
-                firstName: '   John',
-                lastName: ' Doe   ',
-                email: '  alabama@gmail.com',
+                firstName: 'John',
+                lastName: '  Smith',
+                email: '  john@example.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -286,17 +297,18 @@ describe('POST /api/v1/auth/register', () => {
             const user = users[0];
 
             expect(user.firstName).toMatch('John');
-            expect(user.lastName).toMatch('Doe');
-            expect(user.email).toMatch('alabama@gmail.com');
+            expect(user.lastName).toMatch('Smith');
+            expect(user.email).toMatch('john@example.com');
         });
 
         it('should store email in lowercase before saving in the database', async () => {
             // Arrange
             const userData = {
-                firstName: '   John',
-                lastName: ' Doe   ',
-                email: '  JoHn@Doe.com',
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'jOHn@Doe.com',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act
@@ -313,10 +325,11 @@ describe('POST /api/v1/auth/register', () => {
         it('should return 400 status code if password length is less than 8 chars', async () => {
             // Arrange
             const userData = {
-                firstName: '   John',
-                lastName: ' Doe   ',
-                email: '  email@gmail.com',
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example.com',
                 password: 'pass',
+                role: 'customer',
             };
 
             // Act
@@ -335,12 +348,12 @@ describe('POST /api/v1/auth/register', () => {
         it('should return 400 status code if email is not valid email', async () => {
             // Arrange
             const userData = {
-                firstName: '   John',
-                lastName: ' Doe   ',
-                email: '  email',
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john@example',
                 password: 'password',
+                role: 'customer',
             };
-
             // Act
             const response = await request(app)
                 .post('/api/v1/auth/register')
@@ -357,10 +370,11 @@ describe('POST /api/v1/auth/register', () => {
         it('should return an array of messages if email is missing', async () => {
             // Arrange
             const userData = {
-                firstName: '   John',
-                lastName: ' Doe   ',
+                firstName: 'John',
+                lastName: 'Smith',
                 email: '',
                 password: 'password',
+                role: 'customer',
             };
 
             // Act

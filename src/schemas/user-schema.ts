@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { Roles } from '../constants';
+
 export const userRegistrationSchema = z
     .object({
         firstName: z
@@ -19,6 +21,7 @@ export const userRegistrationSchema = z
             .string()
             .trim()
             .min(8, { message: 'Password must be at least 8 characters long' }),
+        role: z.nativeEnum(Roles, { message: 'Invalid Roles' }),
     })
     .strict();
 

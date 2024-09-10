@@ -61,7 +61,7 @@ export class TenantService {
         } catch (error) {
             this.logger.error(error);
             throw createHttpError(
-                'StatusCodes.INTERNAL_SERVER_ERROR',
+                StatusCodes.INTERNAL_SERVER_ERROR,
                 'Failed to fetch all tenants',
             );
         }

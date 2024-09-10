@@ -99,4 +99,24 @@ export class TenantController {
             next(error);
         }
     }
+
+    async findAll(
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
+        this.logger.info('TenantController :: Request to get all tenants list');
+        try {
+            const response = await this.tenantService.findAll();
+
+            this.logger.info(
+                'TenantController :: Successfully fetched all tenants',
+            );
+
+            res.status(StatusCodes.OK).json(response);
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
 }

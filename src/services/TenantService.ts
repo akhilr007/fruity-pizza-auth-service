@@ -54,4 +54,16 @@ export class TenantService {
             );
         }
     }
+
+    async findAll(): Promise<Tenant[]> {
+        try {
+            return await this.tenantRepository.find();
+        } catch (error) {
+            this.logger.error(error);
+            throw createHttpError(
+                'StatusCodes.INTERNAL_SERVER_ERROR',
+                'Failed to fetch all tenants',
+            );
+        }
+    }
 }

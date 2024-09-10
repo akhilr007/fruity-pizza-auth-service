@@ -66,4 +66,8 @@ export class TenantService {
             );
         }
     }
+
+    async deleteById(tenantId: number) {
+        return await this.tenantRepository.delete(tenantId);
+    }
 }

@@ -5,7 +5,7 @@ import { Logger } from 'winston';
 
 import { Roles } from '../constants';
 import { UserService } from '../services/UserService';
-import { CreateManagerRequest } from '../types';
+import { CreateManagerRequest, UserResponse } from '../types';
 
 export class AdminController {
     constructor(
@@ -41,12 +41,10 @@ export class AdminController {
     ): Promise<void> {
         const userId = req.params.id;
         this.logger.info(
-            'TenantController :: Request for getting a user with id ' + userId,
+            'AdminController :: Request for getting a user with id ' + userId,
         );
         if (isNaN(Number(userId))) {
-            this.logger.error(
-                'TenantController :: Invalid tenant id:' + userId,
-            );
+            this.logger.error('AdminController :: Invalid user id:' + userId);
             next(
                 createHttpError(StatusCodes.BAD_REQUEST, 'Invalid url param.'),
             );
@@ -63,7 +61,15 @@ export class AdminController {
                 );
                 return;
             }
-            res.status(StatusCodes.OK).json(user);
+
+            const userResponse: UserResponse = {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+            };
+            res.status(StatusCodes.OK).json(userResponse);
         } catch (error) {
             this.logger.error(error);
             next(error);

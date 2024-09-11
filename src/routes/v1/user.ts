@@ -9,6 +9,7 @@ import { userRepository } from '../../repositories/user.repository';
 import updateUserSchemaWithTenant from '../../schemas/user-schema';
 import { UserService } from '../../services/UserService';
 import { UpdateUserRequest } from '../../types';
+import { listUserValidator } from '../../validators/listUserValidator';
 import { validateData } from '../../validators/validateData';
 
 const router = Router();
@@ -33,8 +34,12 @@ router.patch(
         adminController.update(req, res, next) as unknown as RequestHandler,
 );
 
-router.get('/', authenticate, canAccess([Roles.ADMIN]), (req, res, next) =>
-    adminController.findAll(req, res, next),
+router.get(
+    '/',
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    listUserValidator,
+    (req, res, next) => adminController.findAll(req, res, next),
 );
 
 router.delete(

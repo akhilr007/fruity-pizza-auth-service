@@ -8,6 +8,7 @@ import { UserService } from '../services/UserService';
 import {
     CreateManagerRequest,
     UpdateUserRequest,
+    UserQueryParams,
     UserResponse,
 } from '../types';
 
@@ -83,8 +84,35 @@ export class AdminController {
     async findAll(req: Request, res: Response, next: NextFunction) {
         this.logger.info('AdminController :: Request to get all users');
         try {
-            const users: UserResponse[] = await this.userService.findAll();
-            res.status(StatusCodes.OK).json(users);
+            const validatedQuery = req.query;
+
+            const [users, count] = await this.userService.findAll(
+                validatedQuery as unknown as UserQueryParams,
+            );
+
+            this.logger.info('All users have been fetched');
+
+            const responseUsers = users.map((user) => ({
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                tenant: user.tenant
+                    ? {
+                          id: user.tenant.id,
+                          name: user.tenant.name,
+                          address: user.tenant.address,
+                      }
+                    : null,
+            }));
+
+            res.status(StatusCodes.OK).json({
+                currentPage: validatedQuery.currentPage,
+                perPage: validatedQuery.perPage,
+                total: count,
+                data: responseUsers,
+            });
         } catch (error) {
             this.logger.error(error);
             next(error);

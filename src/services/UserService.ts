@@ -71,4 +71,15 @@ export class UserService {
             },
         });
     }
+
+    async findAll() {
+        const users = await this.userRepository.find();
+        return users.map((user) => ({
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            role: user.role,
+        }));
+    }
 }

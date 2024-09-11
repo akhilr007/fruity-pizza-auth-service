@@ -75,4 +75,15 @@ export class AdminController {
             next(error);
         }
     }
+
+    async findAll(req: Request, res: Response, next: NextFunction) {
+        this.logger.info('AdminController :: Request to get all users');
+        try {
+            const users: UserResponse[] = await this.userService.findAll();
+            res.status(StatusCodes.OK).json(users);
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
 }

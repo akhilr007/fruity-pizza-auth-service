@@ -21,4 +21,8 @@ router.get('/:id', authenticate, canAccess([Roles.ADMIN]), (req, res, next) =>
     adminController.findById(req, res, next),
 );
 
+router.get('/', authenticate, canAccess([Roles.ADMIN]), (req, res, next) =>
+    adminController.findAll(req, res, next),
+);
+
 export default router;

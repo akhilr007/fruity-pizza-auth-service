@@ -50,7 +50,7 @@ const updateUserSchema = z.object({
         .min(1, { message: 'Email is required!' }),
 
     // For tenantId, we will use .refine to handle conditional validation
-    tenantId: z.string().trim().optional(), // Initially optional
+    tenantId: z.number().optional(), // Initially optional
 });
 
 // Add conditional logic based on the role

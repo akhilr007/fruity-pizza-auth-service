@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import createHttpError, { HttpError } from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
-import { z, ZodError } from 'zod';
+import { ZodEffects, ZodError, ZodObject } from 'zod';
 
 export function validateData(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    schema: z.ZodObject<any>,
+    schema: ZodObject<any> | ZodEffects<ZodObject<any>>,
     target: 'body' | 'query' | 'params' = 'body',
 ) {
     return (req: Request, res: Response, next: NextFunction) => {

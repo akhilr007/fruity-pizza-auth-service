@@ -35,3 +35,33 @@ export const userLoginSchema = z
         password: z.string().trim(),
     })
     .strict();
+
+const updateUserSchema = z.object({
+    firstName: z.string().trim().min(1, { message: 'First name is required!' }),
+
+    lastName: z.string().trim().min(1, { message: 'Last name is required!' }),
+
+    role: z.string().trim().min(1, { message: 'Role is required!' }),
+
+    email: z
+        .string()
+        .trim()
+        .email({ message: 'Invalid email!' })
+        .min(1, { message: 'Email is required!' }),
+
+    // For tenantId, we will use .refine to handle conditional validation
+    tenantId: z.string().trim().optional(), // Initially optional
+});
+
+// Add conditional logic based on the role
+const updateUserSchemaWithTenant = updateUserSchema.superRefine((data, ctx) => {
+    if (data.role !== 'admin' && !data.tenantId) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['tenantId'],
+            message: 'Tenant id is required!',
+        });
+    }
+});
+
+export default updateUserSchemaWithTenant;

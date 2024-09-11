@@ -6,6 +6,7 @@ export interface UserData {
     email: string;
     password: string;
     role: string;
+    tenantId?: number;
 }
 
 export interface RegisterUserRequest extends Request {
@@ -41,4 +42,15 @@ export interface UserResponse {
     lastName: string;
     email: string;
     role: string;
+}
+
+export interface LimitedUserData {
+    firstName: string;
+    lastName: string;
+    role: string;
+    email: string;
+    tenantId: number;
+}
+export interface UpdateUserRequest extends Request {
+    body: LimitedUserData;
 }

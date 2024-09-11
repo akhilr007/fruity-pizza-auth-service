@@ -5,7 +5,11 @@ import { Logger } from 'winston';
 
 import { Roles } from '../constants';
 import { UserService } from '../services/UserService';
-import { CreateManagerRequest, UserResponse } from '../types';
+import {
+    CreateManagerRequest,
+    UpdateUserRequest,
+    UserResponse,
+} from '../types';
 
 export class AdminController {
     constructor(
@@ -111,6 +115,42 @@ export class AdminController {
             );
 
             res.status(StatusCodes.OK).json({ success: true, id: userId });
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
+
+    async update(req: UpdateUserRequest, res: Response, next: NextFunction) {
+        const userId = req.params.id;
+
+        this.logger.info(
+            'AdminController :: Request to update user with id: ' + userId,
+        );
+
+        if (isNaN(Number(userId))) {
+            this.logger.error('AdminController :: Invalid user id:' + userId);
+            next(
+                createHttpError(StatusCodes.BAD_REQUEST, 'Invalid url param.'),
+            );
+            return;
+        }
+
+        const { firstName, lastName, email, role, tenantId } = req.body;
+        try {
+            await this.userService.update(Number(userId), {
+                firstName,
+                lastName,
+                email,
+                role,
+                tenantId,
+            });
+
+            this.logger.info('TenantController :: User has been updated', {
+                id: userId,
+            });
+
+            res.status(StatusCodes.OK).json({ id: Number(userId) });
         } catch (error) {
             this.logger.error(error);
             next(error);

@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 
 import { Config } from '../configs';
 import { User } from '../entity/User';
-import { UserData } from '../types';
+import { LimitedUserData, UserData } from '../types';
 
 export class UserService {
     constructor(
@@ -20,6 +20,7 @@ export class UserService {
         email,
         password,
         role,
+        tenantId,
     }: UserData): Promise<User> {
         // check for unique user
         const user = await this.findByEmail(email);
@@ -43,6 +44,7 @@ export class UserService {
                 email,
                 password: hashedPassword,
                 role,
+                tenant: tenantId ? { id: tenantId } : undefined,
             });
             this.logger.info(
                 `User Service :: Successfully registered user with id:  ${user.id}`,
@@ -61,6 +63,9 @@ export class UserService {
             where: {
                 email: email,
             },
+            relations: {
+                tenant: true,
+            },
         });
     }
 
@@ -68,6 +73,9 @@ export class UserService {
         return await this.userRepository.findOne({
             where: {
                 id: id,
+            },
+            relations: {
+                tenant: true,
             },
         });
     }
@@ -85,5 +93,18 @@ export class UserService {
 
     async deleteById(id: number) {
         return await this.userRepository.delete(id);
+    }
+
+    async update(
+        userId: number,
+        { firstName, lastName, role, email, tenantId }: LimitedUserData,
+    ) {
+        return await this.userRepository.update(userId, {
+            firstName,
+            lastName,
+            role,
+            email,
+            tenant: tenantId ? { id: tenantId } : null,
+        });
     }
 }

@@ -82,4 +82,8 @@ export class UserService {
             role: user.role,
         }));
     }
+
+    async deleteById(id: number) {
+        return await this.userRepository.delete(id);
+    }
 }

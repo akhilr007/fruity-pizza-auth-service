@@ -86,4 +86,34 @@ export class AdminController {
             next(error);
         }
     }
+
+    async deleteById(req: Request, res: Response, next: NextFunction) {
+        const userId = req.params.id;
+
+        this.logger.info(
+            'AdminController :: Request to delete user with id: ' + userId,
+        );
+
+        if (isNaN(Number(userId))) {
+            this.logger.error('AdminController :: Invalid user id:' + userId);
+            next(
+                createHttpError(StatusCodes.BAD_REQUEST, 'Invalid url param.'),
+            );
+            return;
+        }
+
+        try {
+            await this.userService.deleteById(Number(userId));
+
+            this.logger.info(
+                'AdminController :: Successfully deleted user with id: ' +
+                    userId,
+            );
+
+            res.status(StatusCodes.OK).json({ success: true, id: userId });
+        } catch (error) {
+            this.logger.error(error);
+            next(error);
+        }
+    }
 }

@@ -24,7 +24,7 @@ export class AuthService {
             );
         }
         try {
-            return privateKey;
+            return privateKey.replace(/\\n/g, '\n');
         } catch (error) {
             this.logger.error('Error while generating private key: ', error);
             throw createHttpError(

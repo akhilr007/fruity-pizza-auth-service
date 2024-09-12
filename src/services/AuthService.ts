@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import fs from 'fs';
 import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import path from 'path';
 import { Repository } from 'typeorm';
 import { Logger } from 'winston';
 
@@ -17,11 +15,16 @@ export class AuthService {
         private logger: Logger,
     ) {}
 
-    private getPrivateKey(): Buffer {
-        try {
-            return fs.readFileSync(
-                path.join(__dirname, '../../certs/private.pem'),
+    private getPrivateKey(): string {
+        const privateKey = Config.PRIVATE_KEY;
+        if (!privateKey) {
+            throw createHttpError(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                'PRIVATE_KEY IS NOT SET',
             );
+        }
+        try {
+            return privateKey;
         } catch (error) {
             this.logger.error('Error while generating private key: ', error);
             throw createHttpError(

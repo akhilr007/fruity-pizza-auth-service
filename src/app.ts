@@ -1,15 +1,25 @@
 import 'reflect-metadata';
 
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 
+import { Config } from './configs';
 import logger from './configs/logger';
 import apiRouter from './routes/index';
 
 const app = express();
+const FRONTEND_URL = Config.FRONTEND_URL || '';
 
+/* middlewares */
+app.use(
+    cors({
+        origin: [FRONTEND_URL],
+        credentials: true,
+    }),
+);
 app.use(express.static('public'));
 app.use(cookieParser());
 app.use(express.json());

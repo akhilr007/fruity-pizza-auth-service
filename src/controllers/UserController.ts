@@ -157,7 +157,11 @@ export class UserController {
             this.logger.info(
                 'User Controller :: Successfull in refreshing the token',
             );
-            res.status(StatusCodes.OK).json({ ...user, password: undefined });
+            res.status(StatusCodes.OK).json({
+                ...user,
+                password: undefined,
+                tenant: undefined,
+            });
         } catch (error) {
             this.logger.error(error);
             next(error);

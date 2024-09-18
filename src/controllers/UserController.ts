@@ -160,7 +160,6 @@ export class UserController {
             res.status(StatusCodes.OK).json({
                 ...user,
                 password: undefined,
-                tenant: undefined,
             });
         } catch (error) {
             this.logger.error(error);

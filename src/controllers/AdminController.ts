@@ -3,7 +3,6 @@ import createHttpError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
-import { Roles } from '../constants';
 import { UserService } from '../services/UserService';
 import {
     CreateManagerRequest,
@@ -22,14 +21,14 @@ export class AdminController {
         res: Response,
         next: NextFunction,
     ): Promise<void> {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, role } = req.body;
         try {
             const user = await this.userService.create({
                 firstName,
                 lastName,
                 email,
                 password,
-                role: Roles.MANAGER,
+                role: role,
             });
 
             res.status(StatusCodes.CREATED).json({ id: user.id });

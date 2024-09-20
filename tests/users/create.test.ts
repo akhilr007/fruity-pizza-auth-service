@@ -39,6 +39,7 @@ describe('POST /api/v1/users', () => {
                 lastName: 'Doe',
                 email: 'john.doe@email.com',
                 password: 'password',
+                role: Roles.MANAGER,
                 tenantId: 1,
             };
 
@@ -67,6 +68,7 @@ describe('POST /api/v1/users', () => {
                 lastName: 'Doe',
                 email: 'john.doe@email.com',
                 password: 'password',
+                role: Roles.MANAGER,
                 tenantId: 1,
             };
 

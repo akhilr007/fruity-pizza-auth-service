@@ -40,7 +40,7 @@ describe('POST /api/v1/users', () => {
                 email: 'john.doe@email.com',
                 password: 'password',
                 role: Roles.MANAGER,
-                tenantId: 1,
+                tenant: 1,
             };
 
             // generate token
@@ -69,7 +69,7 @@ describe('POST /api/v1/users', () => {
                 email: 'john.doe@email.com',
                 password: 'password',
                 role: Roles.MANAGER,
-                tenantId: 1,
+                tenant: 1,
             };
 
             // generate token

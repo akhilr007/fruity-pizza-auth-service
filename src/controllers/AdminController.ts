@@ -21,14 +21,16 @@ export class AdminController {
         res: Response,
         next: NextFunction,
     ): Promise<void> {
-        const { firstName, lastName, email, password, role } = req.body;
+        const { firstName, lastName, email, password, role, tenantId } =
+            req.body;
         try {
             const user = await this.userService.create({
                 firstName,
                 lastName,
                 email,
                 password,
-                role: role,
+                role,
+                tenantId,
             });
 
             res.status(StatusCodes.CREATED).json({ id: user.id });

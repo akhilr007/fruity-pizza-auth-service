@@ -393,12 +393,17 @@ describe('POST /api/v1/auth/register', () => {
             expect(responseBody).toHaveProperty('errors');
             expect(responseBody.errors).toHaveLength(1);
             expect(Array.isArray(responseBody.errors)).toBe(true);
-            expect(response.body.errors[0]).toEqual({
-                type: 'ValidationError',
-                msg: 'Invalid email address',
-                path: 'email',
-                location: 'body',
-            });
+            expect(responseBody.errors[0]).toEqual(
+                expect.objectContaining({
+                    ref: expect.any(String),
+                    type: 'BadRequestError',
+                    msg: 'Invalid email address',
+                    path: '/api/v1/auth/register',
+                    method: 'POST',
+                    location: 'server',
+                    stack: expect.any(String),
+                }),
+            );
         });
     });
 });

@@ -2,12 +2,10 @@ import 'reflect-metadata';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
-import { HttpError } from 'http-errors';
-import { StatusCodes } from 'http-status-codes';
+import express, { Request, Response } from 'express';
 
 import { Config } from './configs';
-import logger from './configs/logger';
+import { globalErrorHandler } from './middlewares/globalErrorHandler';
 import apiRouter from './routes/index';
 
 const app = express();
@@ -30,36 +28,6 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api', apiRouter);
 
-app.use(
-    (
-        err: HttpError & { errors?: never[] },
-        req: Request,
-        res: Response,
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _next: NextFunction,
-    ) => {
-        logger.error(err.message);
-
-        const statusCode =
-            err.statusCode || err.status || StatusCodes.INTERNAL_SERVER_ERROR;
-
-        if (err.errors) {
-            logger.error(err.errors);
-            return res.status(statusCode).json({ errors: err.errors });
-        }
-
-        res.status(statusCode).json({
-            errors: [
-                {
-                    type: err.name,
-                    msg: err.message,
-                    path: '',
-                    location: '',
-                },
-            ],
-        });
-    },
-);
+app.use(globalErrorHandler);
 
 export default app;

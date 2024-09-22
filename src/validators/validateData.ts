@@ -16,20 +16,22 @@ export function validateData(
             next();
         } catch (error) {
             if (error instanceof ZodError) {
-                const errorMessages = error.errors.map((issue) => ({
-                    type: 'ValidationError',
-                    msg: `${issue.message}`,
-                    path: issue.path.join('.'),
-                    location: 'body',
-                }));
+                const firstError = error.errors[0];
                 const httpError = createHttpError(
                     StatusCodes.BAD_REQUEST,
-                    'Validation Error',
+                    firstError.message, // Use the first error message
                     {
-                        errors: errorMessages,
+                        errors: [
+                            {
+                                type: 'ValidationError',
+                                msg: firstError.message,
+                                path: firstError.path.join('.'),
+                                location: target,
+                            },
+                        ],
                     },
                 );
-                (httpError as HttpError).errors = errorMessages;
+                (httpError as HttpError).errors = [firstError]; // Optionally attach full errors
                 next(httpError);
             } else {
                 next(

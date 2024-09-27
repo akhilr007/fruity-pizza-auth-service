@@ -11,10 +11,10 @@ import { AuthRequest, RegisterUserRequest } from '../types';
 
 export class UserController {
     constructor(
-        private userService: UserService,
-        private authService: AuthService,
-        private credentialService: CredentialService,
-        private logger: Logger,
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
+        private readonly credentialService: CredentialService,
+        private readonly logger: Logger,
     ) {}
 
     async register(
@@ -112,6 +112,7 @@ export class UserController {
             const payload = {
                 sub: String(user.id),
                 role: user.role,
+                tenant: user.tenant ? String(user.tenant.id) : '',
                 issuer: 'auth-service',
             };
 
@@ -142,6 +143,7 @@ export class UserController {
         this.logger.info('User Controller :: Request for refresh token ', {
             sub: req.auth.sub,
             role: req.auth.role,
+            tenant: req.auth.tenant,
         });
 
         try {

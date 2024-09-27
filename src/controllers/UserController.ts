@@ -11,10 +11,10 @@ import { AuthRequest, RegisterUserRequest } from '../types';
 
 export class UserController {
     constructor(
-        private userService: UserService,
-        private authService: AuthService,
-        private credentialService: CredentialService,
-        private logger: Logger,
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
+        private readonly credentialService: CredentialService,
+        private readonly logger: Logger,
     ) {}
 
     async register(

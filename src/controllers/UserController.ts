@@ -112,6 +112,7 @@ export class UserController {
             const payload = {
                 sub: String(user.id),
                 role: user.role,
+                tenant: user.tenant ? String(user.tenant.id) : '',
                 issuer: 'auth-service',
             };
 
@@ -142,6 +143,7 @@ export class UserController {
         this.logger.info('User Controller :: Request for refresh token ', {
             sub: req.auth.sub,
             role: req.auth.role,
+            tenant: req.auth.tenant,
         });
 
         try {
